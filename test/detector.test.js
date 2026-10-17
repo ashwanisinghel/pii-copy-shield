@@ -7,9 +7,9 @@ const context = { globalThis: {}, self: {} };
 vm.runInNewContext(source, context);
 const { sanitize } = context.globalThis.PiiDetector;
 
-const result = sanitize("Email jane@example.com, SSN 123-45-6789, card 4111 1111 1111 1111, IP 192.168.1.10.");
-assert.equal(result.text, "Email [EMAIL], SSN [SSN], card [CARD], IP [IP_ADDRESS].");
-assert.equal(result.replacements.length, 4);
+const result = sanitize("Email jane@example.com, card 4111 1111 1111 1111, IP 192.168.1.10.");
+assert.equal(result.text, "Email [EMAIL], card [CARD], IP [IP_ADDRESS].");
+assert.equal(result.replacements.length, 3);
 assert.equal(sanitize("Call 1-800-FLOWERS for help.").text, "Call [PHONE] for help.");
 assert.equal(sanitize("India: +91 98765 43210 or 09876543210").text, "India: [PHONE] or [PHONE]");
 assert.equal(sanitize("PAN ABCPD1234F, Aadhaar 2345 6789 0124").text, "PAN [PAN], Aadhaar [AADHAAR]");
@@ -22,7 +22,6 @@ assert.equal(sanitize("Aadhaar (2345-6789-0124) was verified at the branch.").te
 assert.equal(sanitize("Aadhaar 2345  6789\n0124 was verified.").text, "Aadhaar [AADHAAR] was verified.");
 assert.equal(sanitize("Call me on +91 98765 43210 after 6 pm, or try 09876543210.").text, "Call me on [PHONE] after 6 pm, or try [PHONE].");
 assert.equal(sanitize("You can reach US support at (415) 555-0132 anytime.").text, "You can reach US support at [PHONE] anytime.");
-assert.equal(sanitize("Her SSN is 123-45-6789 as per the W-4 form.").text, "Her SSN is [SSN] as per the W-4 form.");
 assert.equal(sanitize("Charge it to 5555 5555 5555 4444, expiry 12/28.").text, "Charge it to [CARD], expiry 12/28.");
 assert.equal(sanitize("Backup card: 4111-1111-1111-1111.").text, "Backup card: [CARD].");
 assert.equal(sanitize("Amex: 3782 822463 10005.").text, "Amex: [CARD].");
@@ -39,10 +38,10 @@ assert.equal(sanitize("Version 2.0.1 shipped on 17/10/2026 for ₹1,25,000.").te
 assert.equal(sanitize("Ping me at user@ later.").text, "Ping me at user@ later.");
 assert.equal(sanitize("Lowercase PAN abcpd1234f is also sensitive.").text, "Lowercase PAN [PAN] is also sensitive.");
 assert.equal(sanitize("id2345 6789 0124x should remain an internal ID.").text, "id2345 6789 0124x should remain an internal ID.");
-assert.equal(sanitize("SSN-like 000-12-3456 and 666-12-3456 remain format matches.").text, "SSN-like [SSN] and [SSN] remain format matches.");
+assert.equal(sanitize("US SSN 123-45-6789 is no longer detected.").text, "US SSN 123-45-6789 is no longer detected.");
 assert.equal(sanitize("Order 1-800-555 is too short to be a phone number.").text, "Order 1-800-555 is too short to be a phone number.");
 assert.equal(sanitize("jane@example.com", { email: false }).text, "jane@example.com");
-assert.equal(sanitize("Mail jane@example.com, SSN 123-45-6789", { email: false }).text, "Mail jane@example.com, SSN [SSN]");
+assert.equal(sanitize("Mail jane@example.com, ip 10.0.0.25", { email: false }).text, "Mail jane@example.com, ip [IP_ADDRESS]");
 assert.equal(sanitize("Order 2345 6789 0123 shipped.").text, "Order 2345 6789 0123 shipped.");
 assert.equal(sanitize("a@b.co 4111 1111 1111 1111").replacements.length, 2);
 console.log("detector tests passed");

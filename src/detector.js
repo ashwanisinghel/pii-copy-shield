@@ -4,7 +4,6 @@
   const DEFAULT_SETTINGS = {
     email: true,
     phone: true,
-    ssn: true,
     creditCard: true,
     ipAddress: true,
     pan: true,
@@ -20,8 +19,7 @@
     { key: "creditCard", pattern: /(?<!\d)(?:\d[ -]*?){13,19}(?!\d)/g, placeholder: "[CARD]", validate: passesLuhn },
     { key: "aadhaar", pattern: /(?<![\w])[2-9]\d{3}(?:\s+|-)?\d{4}(?:\s+|-)?\d{4}(?![\w])(?!(?:[ \t-]+)\d)/g, placeholder: "[AADHAAR]", validate: passesVerhoeff },
     { key: "phone", pattern: /(?<![\d.])(?:(?:\+91|0091|0)[\s.-]*)?(?:[6-9]\d{4}[\s.-]?\d{5}|[6-9]\d{2}[\s.-]?\d{3}[\s.-]?\d{4})(?![\d.])/g, placeholder: "[PHONE]" },
-    { key: "phone", pattern: /(?<!\d)(?!(?:\d{4}[ -]?){2}\d{4}(?!\d))(?!(?:\d{1,3}\.){3}\d{1,3}(?=$|[^\d.]|\.(?!\d)))(?:(?:\+?\d)|(?:\(\d{3}\)))[\d .()-]{7,}\d(?!\d)/g, placeholder: "[PHONE]", validate: isGenericPhoneLength },
-    { key: "ssn", pattern: /(?<!\d)\d{3}-\d{2}-\d{4}(?!\d)/g, placeholder: "[SSN]" }
+    { key: "phone", pattern: /(?<!\d)(?!(?:\d{4}[ -]?){2}\d{4}(?!\d))(?!(?:\d{1,3}\.){3}\d{1,3}(?=$|[^\d.]|\.(?!\d)))(?:(?:\+?\d)|(?:\(\d{3}\)))[\d .()-]{7,}\d(?!\d)/g, placeholder: "[PHONE]", validate: isGenericPhoneLength }
   ];
 
   function passesLuhn(value) {
