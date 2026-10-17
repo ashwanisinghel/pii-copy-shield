@@ -8,7 +8,8 @@
     creditCard: true,
     ipAddress: true,
     pan: true,
-    aadhaar: true
+    aadhaar: true,
+    blurOnPage: false
   };
 
   const RULES = [
@@ -69,7 +70,7 @@
     return digitCount >= 10 && digitCount <= 12;
   }
 
-  function sanitize(text, settings) {
+  function find(text, settings) {
     const activeSettings = Object.assign({}, DEFAULT_SETTINGS, settings);
     const accepted = [];
 
@@ -81,22 +82,28 @@
         const end = start + match[0].length;
         if (rule.validate && !rule.validate(match[0])) continue;
         if (accepted.some((other) => start < other.end && end > other.start)) continue;
-        accepted.push({ start, end, rule });
+        accepted.push({ start, end, type: rule.key, placeholder: rule.placeholder });
       }
     });
 
-    accepted.sort((a, b) => a.start - b.start);
+    return accepted.sort((a, b) => a.start - b.start);
+  }
+
+  function sanitize(text, settings) {
+    const matches = find(text, settings);
     let sanitized = "";
     let cursor = 0;
-    const replacements = accepted.map(({ start, end, rule }) => {
-      sanitized += text.slice(cursor, start) + rule.placeholder;
+    matches.forEach(({ start, end, placeholder }) => {
+      sanitized += text.slice(cursor, start) + placeholder;
       cursor = end;
-      return { type: rule.key, placeholder: rule.placeholder };
     });
     sanitized += text.slice(cursor);
 
-    return { text: sanitized, replacements };
+    return {
+      text: sanitized,
+      replacements: matches.map(({ type, placeholder }) => ({ type, placeholder }))
+    };
   }
 
-  root.PiiDetector = { DEFAULT_SETTINGS, sanitize };
+  root.PiiDetector = { DEFAULT_SETTINGS, find, sanitize };
 })(typeof globalThis === "undefined" ? self : globalThis);

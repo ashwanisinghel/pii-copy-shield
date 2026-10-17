@@ -9,9 +9,16 @@
     document.dispatchEvent(new CustomEvent("pii-copy-shield-settings", { detail: JSON.stringify(settings) }));
   }
 
+  function applyBlur() {
+    // Restart so rule changes also apply to text that was already scanned.
+    PiiBlur.stop();
+    if (settings.blurOnPage) PiiBlur.start(settings);
+  }
+
   storage.sync.get(PiiDetector.DEFAULT_SETTINGS).then((storedSettings) => {
     settings = Object.assign({}, settings, storedSettings);
     shareSettings();
+    applyBlur();
   });
 
   storage.onChanged.addListener((changes, areaName) => {
@@ -21,6 +28,7 @@
       settings[key] = newValue === undefined ? PiiDetector.DEFAULT_SETTINGS[key] : newValue;
     });
     shareSettings();
+    applyBlur();
   });
 
   function getSelectedText(event) {
