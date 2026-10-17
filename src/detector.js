@@ -8,8 +8,12 @@
     ipAddress: true,
     pan: true,
     aadhaar: true,
-    blurOnPage: false
+    blurOnPage: false,
+    exclusions: []
   };
+
+  const MAX_EXCLUSIONS = 50;
+  const MAX_EXCLUSION_LENGTH = 64;
 
   const RULES = [
     { key: "email", pattern: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, placeholder: "[EMAIL]" },
@@ -68,9 +72,24 @@
     return digitCount >= 10 && digitCount <= 12;
   }
 
+  // Exclusions are literal values, never patterns: they are only compared for
+  // equality with a detected match, so "*" or "." mean exactly those characters.
+  // Phone-like values ignore spacing and separators; everything else ignores case.
+  function normalizeExclusion(value) {
+    const trimmed = String(value).trim();
+    if (/^\+?[\d\s()-]+$/.test(trimmed)) return trimmed.replace(/\D/g, "");
+    return trimmed.replace(/\s+/g, " ").toLowerCase();
+  }
+
   function find(text, settings) {
     const activeSettings = Object.assign({}, DEFAULT_SETTINGS, settings);
     const accepted = [];
+    const excluded = new Set(
+      (Array.isArray(activeSettings.exclusions) ? activeSettings.exclusions : [])
+        .filter((value) => typeof value === "string")
+        .map(normalizeExclusion)
+        .filter(Boolean)
+    );
 
     // Every rule scans the original text; an earlier rule wins any overlap.
     RULES.forEach((rule) => {
@@ -79,6 +98,7 @@
         const start = match.index;
         const end = start + match[0].length;
         if (rule.validate && !rule.validate(match[0])) continue;
+        if (excluded.size && excluded.has(normalizeExclusion(match[0]))) continue;
         if (accepted.some((other) => start < other.end && end > other.start)) continue;
         accepted.push({ start, end, type: rule.key, placeholder: rule.placeholder });
       }
@@ -103,5 +123,5 @@
     };
   }
 
-  root.PiiDetector = { DEFAULT_SETTINGS, find, sanitize };
+  root.PiiDetector = { DEFAULT_SETTINGS, MAX_EXCLUSIONS, MAX_EXCLUSION_LENGTH, normalizeExclusion, find, sanitize };
 })(typeof globalThis === "undefined" ? self : globalThis);

@@ -44,4 +44,13 @@ assert.equal(sanitize("jane@example.com", { email: false }).text, "jane@example.
 assert.equal(sanitize("Mail jane@example.com, ip 10.0.0.25", { email: false }).text, "Mail jane@example.com, ip [IP_ADDRESS]");
 assert.equal(sanitize("Order 2345 6789 0123 shipped.").text, "Order 2345 6789 0123 shipped.");
 assert.equal(sanitize("a@b.co 4111 1111 1111 1111").replacements.length, 2);
+const ex = (text, exclusions) => sanitize(text, { exclusions }).text;
+assert.equal(ex("Mail Support@Example.com and jane@example.com", ["support@example.com"]), "Mail Support@Example.com and [EMAIL]");
+assert.equal(ex("Call +91 98765 43210", ["9876543210"]), "Call [PHONE]");
+assert.equal(ex("Call 098765 43210 now", ["098 7654 3210"]), "Call 098765 43210 now");
+assert.equal(ex("Server 10.0.0.25 and 10.0.0.26", ["10.0.0.25"]), "Server 10.0.0.25 and [IP_ADDRESS]");
+assert.equal(ex("a@b.co c@d.co", ["*@*.co"]), "[EMAIL] [EMAIL]");
+assert.equal(ex("a@b.co c@d.co", [".*"]), "[EMAIL] [EMAIL]");
+assert.equal(ex("a@b.co c@d.co", ["b.co"]), "[EMAIL] [EMAIL]");
+assert.equal(ex("a@b.co", [null, 5, ""]), "[EMAIL]");
 console.log("detector tests passed");

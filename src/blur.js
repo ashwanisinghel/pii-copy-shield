@@ -8,13 +8,26 @@
 
   let settings = null;
   let observer = null;
+  const hoverHandlers = new WeakMap();
 
   function hide(element) {
     element.setAttribute(MARK, "");
     element.style.setProperty("filter", BLUR, "important");
     element.style.setProperty("transition", "filter 0.15s", "important");
-    element.addEventListener("mouseenter", () => element.style.setProperty("filter", "none", "important"));
-    element.addEventListener("mouseleave", () => element.style.setProperty("filter", BLUR, "important"));
+    const reveal = () => element.style.setProperty("filter", "none", "important");
+    const conceal = () => element.style.setProperty("filter", BLUR, "important");
+    element.addEventListener("mouseenter", reveal);
+    element.addEventListener("mouseleave", conceal);
+    hoverHandlers.set(element, { reveal, conceal });
+  }
+
+  function unhide(element) {
+    const handlers = hoverHandlers.get(element);
+    if (handlers) {
+      element.removeEventListener("mouseenter", handlers.reveal);
+      element.removeEventListener("mouseleave", handlers.conceal);
+      hoverHandlers.delete(element);
+    }
   }
 
   function isEditable(element) {
@@ -90,6 +103,7 @@
     if (observer) observer.disconnect();
     observer = null;
     document.querySelectorAll("[" + MARK + "]").forEach((element) => {
+      unhide(element);
       if (element.tagName === "SPAN") element.replaceWith(document.createTextNode(element.textContent));
       else {
         element.removeAttribute(MARK);

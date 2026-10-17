@@ -17,3 +17,10 @@ input { width: 18px; height: 18px; accent-color: #b24d2e; }
 label span { margin-left: auto; color: #b24d2e; font: 700 .75rem system-ui, sans-serif; }
 #status { min-height: 1.5em; color: #27745c; font: 700 .9rem system-ui, sans-serif; }
 .note { color: #6a716f; font: .85rem/1.45 system-ui, sans-serif; }
+.hint { margin: 0 0 14px; color: #56616b; font: .85rem/1.45 system-ui, sans-serif; }
+#exclusion-form { display: flex; gap: 8px; }
+#exclusion-input { flex: 1; width: auto; height: auto; padding: 8px 10px; border: 1px solid #c9c0b2; background: #fff; font: .95rem system-ui, sans-serif; }
+#exclusion-form button, .remove { padding: 8px 14px; border: 1px solid #b24d2e; background: transparent; color: #b24d2e; font: 700 .85rem system-ui, sans-serif; cursor: pointer; }
+#exclusion-list { margin: 12px 0 0; padding: 0; list-style: none; }
+#exclusion-list li { display: flex; gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid #ded7cb; font: .95rem system-ui, sans-serif; word-break: break-all; }
+#exclusion-list .remove { margin-left: auto; padding: 4px 10px; }
