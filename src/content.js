@@ -11,20 +11,48 @@
   storage.onChanged.addListener((changes, areaName) => {
     if (areaName !== "sync") return;
     Object.keys(changes).forEach((key) => {
-      settings[key] = changes[key].newValue;
+      const { newValue } = changes[key];
+      settings[key] = newValue === undefined ? PiiDetector.DEFAULT_SETTINGS[key] : newValue;
     });
   });
 
-  document.addEventListener("copy", (event) => {
+  function getSelectedText(event) {
+    const path = typeof event.composedPath === "function" ? event.composedPath() : [];
+    const candidates = path.concat([event.target, document.activeElement]);
+    for (const candidate of candidates) {
+      if (candidate && typeof candidate.value === "string" &&
+          typeof candidate.selectionStart === "number" &&
+          typeof candidate.selectionEnd === "number" &&
+          candidate.selectionStart !== candidate.selectionEnd) {
+        return candidate.value.slice(candidate.selectionStart, candidate.selectionEnd);
+      }
+    }
+
     const selection = window.getSelection();
-    const selectedText = selection ? selection.toString() : "";
-    if (!selectedText) return;
+    return selection ? selection.toString() : "";
+  }
+
+  function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function sanitizeClipboard(event) {
+    const selectedText = getSelectedText(event);
+    if (!selectedText) return false;
 
     const result = PiiDetector.sanitize(selectedText, settings);
-    if (!result.replacements.length) return;
+    if (!result.replacements.length) return false;
 
     event.preventDefault();
     event.clipboardData.setData("text/plain", result.text);
-    event.clipboardData.setData("text/html", result.text.replace(/\n/g, "<br>"));
+    event.clipboardData.setData("text/html", escapeHtml(result.text).replace(/\n/g, "<br>"));
+    return true;
+  }
+
+  document.addEventListener("copy", sanitizeClipboard, true);
+
+  document.addEventListener("cut", (event) => {
+    // Cancelling the event also cancels the browser's deletion, so delete manually.
+    if (sanitizeClipboard(event)) document.execCommand("delete");
   }, true);
 })();
