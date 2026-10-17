@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "PII Copy Shield",
+  "version": "1.0.0",
+  "description": "Replaces detected personal information with placeholders before it reaches the clipboard.",
+  "permissions": ["storage"],
+  "action": {
+    "default_title": "PII Copy Shield",
+    "default_popup": "options.html"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/detector.js", "src/content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "pii-copy-shield@local",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
+}

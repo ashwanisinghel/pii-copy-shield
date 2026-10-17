@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PII Copy Shield</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">LOCAL CLIPBOARD PROTECTION</p>
+      <h1>PII Copy Shield</h1>
+      <p class="intro">Choose which sensitive values should become placeholders when copied.</p>
+    </header>
+    <section class="settings" aria-labelledby="settings-title">
+      <h2 id="settings-title">Detection rules</h2>
+      <label><input type="checkbox" data-setting="email"> Email addresses <span>[EMAIL]</span></label>
+      <label><input type="checkbox" data-setting="phone"> Phone numbers <span>[PHONE]</span></label>
+      <label><input type="checkbox" data-setting="ssn"> Social Security numbers <span>[SSN]</span></label>
+      <label><input type="checkbox" data-setting="creditCard"> Payment card numbers <span>[CARD]</span></label>
+      <label><input type="checkbox" data-setting="ipAddress"> IPv4 addresses <span>[IP_ADDRESS]</span></label>
+    </section>
+    <p id="status" role="status" aria-live="polite"></p>
+    <p class="note">Detection runs locally in the page where you copy. Clipboard contents are never sent anywhere.</p>
+  </main>
+  <script src="src/detector.js"></script>
+  <script src="src/options.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+## Release packages
+*.xpi
+*.zip
+
+## Dependencies and local tooling
+node_modules/
+
+## Operating-system metadata
+.DS_Store
+Thumbs.db
