@@ -4,8 +4,14 @@
   const storage = typeof browser !== "undefined" ? browser.storage : chrome.storage;
   let settings = Object.assign({}, PiiDetector.DEFAULT_SETTINGS);
 
+  // Lets src/page-hook.js, which runs in the page's world, use the same settings.
+  function shareSettings() {
+    document.dispatchEvent(new CustomEvent("pii-copy-shield-settings", { detail: JSON.stringify(settings) }));
+  }
+
   storage.sync.get(PiiDetector.DEFAULT_SETTINGS).then((storedSettings) => {
     settings = Object.assign({}, settings, storedSettings);
+    shareSettings();
   });
 
   storage.onChanged.addListener((changes, areaName) => {
@@ -14,6 +20,7 @@
       const { newValue } = changes[key];
       settings[key] = newValue === undefined ? PiiDetector.DEFAULT_SETTINGS[key] : newValue;
     });
+    shareSettings();
   });
 
   function getSelectedText(event) {
