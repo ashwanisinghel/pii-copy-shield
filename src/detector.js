@@ -4,11 +4,11 @@
   const DEFAULT_SETTINGS = {
     email: true,
     phone: true,
-    ssn: true,
     creditCard: true,
     ipAddress: true,
     pan: true,
-    aadhaar: true
+    aadhaar: true,
+    blurOnPage: false
   };
 
   const RULES = [
@@ -19,8 +19,7 @@
     { key: "creditCard", pattern: /(?<!\d)(?:\d[ -]*?){13,19}(?!\d)/g, placeholder: "[CARD]", validate: passesLuhn },
     { key: "aadhaar", pattern: /(?<![\w])[2-9]\d{3}(?:\s+|-)?\d{4}(?:\s+|-)?\d{4}(?![\w])(?!(?:[ \t-]+)\d)/g, placeholder: "[AADHAAR]", validate: passesVerhoeff },
     { key: "phone", pattern: /(?<![\d.])(?:(?:\+91|0091|0)[\s.-]*)?(?:[6-9]\d{4}[\s.-]?\d{5}|[6-9]\d{2}[\s.-]?\d{3}[\s.-]?\d{4})(?![\d.])/g, placeholder: "[PHONE]" },
-    { key: "phone", pattern: /(?<!\d)(?!(?:\d{4}[ -]?){2}\d{4}(?!\d))(?!(?:\d{1,3}\.){3}\d{1,3}(?=$|[^\d.]|\.(?!\d)))(?:(?:\+?\d)|(?:\(\d{3}\)))[\d .()-]{7,}\d(?!\d)/g, placeholder: "[PHONE]", validate: isGenericPhoneLength },
-    { key: "ssn", pattern: /(?<!\d)\d{3}-\d{2}-\d{4}(?!\d)/g, placeholder: "[SSN]" }
+    { key: "phone", pattern: /(?<!\d)(?!(?:\d{4}[ -]?){2}\d{4}(?!\d))(?!(?:\d{1,3}\.){3}\d{1,3}(?=$|[^\d.]|\.(?!\d)))(?:(?:\+?\d)|(?:\(\d{3}\)))[\d .()-]{7,}\d(?!\d)/g, placeholder: "[PHONE]", validate: isGenericPhoneLength }
   ];
 
   function passesLuhn(value) {
@@ -69,7 +68,7 @@
     return digitCount >= 10 && digitCount <= 12;
   }
 
-  function sanitize(text, settings) {
+  function find(text, settings) {
     const activeSettings = Object.assign({}, DEFAULT_SETTINGS, settings);
     const accepted = [];
 
@@ -81,22 +80,28 @@
         const end = start + match[0].length;
         if (rule.validate && !rule.validate(match[0])) continue;
         if (accepted.some((other) => start < other.end && end > other.start)) continue;
-        accepted.push({ start, end, rule });
+        accepted.push({ start, end, type: rule.key, placeholder: rule.placeholder });
       }
     });
 
-    accepted.sort((a, b) => a.start - b.start);
+    return accepted.sort((a, b) => a.start - b.start);
+  }
+
+  function sanitize(text, settings) {
+    const matches = find(text, settings);
     let sanitized = "";
     let cursor = 0;
-    const replacements = accepted.map(({ start, end, rule }) => {
-      sanitized += text.slice(cursor, start) + rule.placeholder;
+    matches.forEach(({ start, end, placeholder }) => {
+      sanitized += text.slice(cursor, start) + placeholder;
       cursor = end;
-      return { type: rule.key, placeholder: rule.placeholder };
     });
     sanitized += text.slice(cursor);
 
-    return { text: sanitized, replacements };
+    return {
+      text: sanitized,
+      replacements: matches.map(({ type, placeholder }) => ({ type, placeholder }))
+    };
   }
 
-  root.PiiDetector = { DEFAULT_SETTINGS, sanitize };
+  root.PiiDetector = { DEFAULT_SETTINGS, find, sanitize };
 })(typeof globalThis === "undefined" ? self : globalThis);

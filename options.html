@@ -17,11 +17,14 @@
       <h2 id="settings-title">Detection rules</h2>
       <label><input type="checkbox" data-setting="email"> Email addresses <span>[EMAIL]</span></label>
       <label><input type="checkbox" data-setting="phone"> Phone numbers <span>[PHONE]</span></label>
-      <label><input type="checkbox" data-setting="ssn"> Social Security numbers <span>[SSN]</span></label>
       <label><input type="checkbox" data-setting="creditCard"> Payment card numbers <span>[CARD]</span></label>
       <label><input type="checkbox" data-setting="ipAddress"> IPv4 addresses <span>[IP_ADDRESS]</span></label>
       <label><input type="checkbox" data-setting="pan"> Indian PAN cards <span>[PAN]</span></label>
       <label><input type="checkbox" data-setting="aadhaar"> Indian Aadhaar numbers <span>[AADHAAR]</span></label>
+    </section>
+    <section class="settings" aria-labelledby="page-title">
+      <h2 id="page-title">On-page protection</h2>
+      <label><input type="checkbox" data-setting="blurOnPage"> Blur detected values on webpages <span>hover to reveal</span></label>
     </section>
     <p id="status" role="status" aria-live="polite"></p>
     <p class="note">Detection runs locally in the page where you copy. Clipboard contents are never sent anywhere.</p>
