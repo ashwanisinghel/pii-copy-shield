@@ -3,9 +3,15 @@
   "name": "PII Copy Shield",
   "version": "1.0.0",
   "description": "Replaces detected personal information with placeholders before it reaches the clipboard.",
+  "icons": {
+    "128": "PII Shield.png"
+  },
   "permissions": ["storage"],
   "action": {
     "default_title": "PII Copy Shield",
+    "default_icon": {
+      "128": "PII Shield.png"
+    },
     "default_popup": "options.html"
   },
   "options_page": "options.html",
