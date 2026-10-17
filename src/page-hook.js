@@ -8,7 +8,7 @@
 
   const SETTINGS_EVENT = "pii-copy-shield-settings";
   const clipboard = navigator.clipboard;
-  if (!detector || !clipboard) return;
+  if (!detector) return;
 
   let settings = Object.assign({}, detector.DEFAULT_SETTINGS);
 
@@ -20,6 +20,39 @@
     }
   });
 
+  // Apps such as spreadsheets fill event.clipboardData themselves in their own copy
+  // handler, without any text selection. Sanitize what they put in it.
+  let inClipboardEvent = false;
+  ["copy", "cut"].forEach((type) => {
+    window.addEventListener(type, () => {
+      inClipboardEvent = true;
+      setTimeout(() => { inClipboardEvent = false; }, 0);
+    }, true);
+  });
+
+  function sanitizeHtml(html) {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const walker = doc.createTreeWalker(doc.documentElement, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((node) => { node.nodeValue = sanitizeText(node.nodeValue).text; });
+    return "<!DOCTYPE html>" + doc.documentElement.outerHTML;
+  }
+
+  const originalSetData = DataTransfer.prototype.setData;
+  DataTransfer.prototype.setData = function (format, data) {
+    if (inClipboardEvent && typeof data === "string") {
+      try {
+        if (format === "text/plain" || format === "text") data = sanitizeText(data).text;
+        else if (format === "text/html") data = sanitizeHtml(data);
+      } catch (error) {
+        // Fall through with the original data rather than breaking the copy.
+      }
+    }
+    return originalSetData.call(this, format, data);
+  };
+
+  if (!clipboard) return;
   const proto = Object.getPrototypeOf(clipboard);
   const originalWriteText = proto.writeText;
   const originalWrite = proto.write;
