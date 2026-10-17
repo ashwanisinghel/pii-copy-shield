@@ -26,6 +26,15 @@
       <h2 id="page-title">On-page protection</h2>
       <label><input type="checkbox" data-setting="blurOnPage"> Blur detected values on webpages <span>hover to reveal</span></label>
     </section>
+    <section class="settings" aria-labelledby="exclusions-title">
+      <h2 id="exclusions-title">Exclusions</h2>
+      <p class="hint">Values listed here are never replaced or blurred. Enter exact values only; wildcards and patterns are not supported, and <code>*</code> or <code>.</code> are matched as plain characters. Emails ignore case; phone and card numbers ignore spaces and dashes.</p>
+      <form id="exclusion-form">
+        <input type="text" id="exclusion-input" maxlength="64" autocomplete="off" placeholder="e.g. support@example.com" aria-label="Value to exclude">
+        <button type="submit">Add</button>
+      </form>
+      <ul id="exclusion-list"></ul>
+    </section>
     <p id="status" role="status" aria-live="polite"></p>
     <p class="note">Detection runs locally in the page where you copy. Clipboard contents are never sent anywhere.</p>
   </main>

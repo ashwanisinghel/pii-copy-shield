@@ -22,11 +22,10 @@
 
   // Apps such as spreadsheets fill event.clipboardData themselves in their own copy
   // handler, without any text selection. Sanitize what they put in it.
-  let inClipboardEvent = false;
+  const clipboardTransfers = new WeakSet();
   ["copy", "cut"].forEach((type) => {
-    window.addEventListener(type, () => {
-      inClipboardEvent = true;
-      setTimeout(() => { inClipboardEvent = false; }, 0);
+    window.addEventListener(type, (event) => {
+      if (event.clipboardData) clipboardTransfers.add(event.clipboardData);
     }, true);
   });
 
@@ -41,7 +40,7 @@
 
   const originalSetData = DataTransfer.prototype.setData;
   DataTransfer.prototype.setData = function (format, data) {
-    if (inClipboardEvent && typeof data === "string") {
+    if (clipboardTransfers.has(this) && typeof data === "string") {
       try {
         if (format === "text/plain" || format === "text") data = sanitizeText(data).text;
         else if (format === "text/html") data = sanitizeHtml(data);
