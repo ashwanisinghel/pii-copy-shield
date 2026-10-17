@@ -12,6 +12,9 @@ assert.equal(result.text, "Email [EMAIL], SSN [SSN], card [CARD], IP [IP_ADDRESS
 assert.equal(result.replacements.length, 4);
 assert.equal(sanitize("Call 1-800-FLOWERS for help.").text, "Call [PHONE] for help.");
 assert.equal(sanitize("India: +91 98765 43210 or 09876543210").text, "India: [PHONE] or [PHONE]");
+assert.equal(sanitize("PAN ABCPD1234F, Aadhaar 2345 6789 0123").text, "PAN [PAN], Aadhaar [AADHAAR]");
+assert.equal(sanitize("Invalid PAN ABCD1234F").text, "Invalid PAN ABCD1234F");
+assert.equal(sanitize("Invalid Aadhaar 2345 6789 0124").text, "Invalid Aadhaar 2345 6789 0124");
 assert.equal(sanitize("The number 4111 1111 1111 1112 is not a valid card.").text, "The number 4111 1111 1111 1112 is not a valid card.");
 assert.equal(sanitize("jane@example.com", { email: false }).text, "jane@example.com");
 console.log("detector tests passed");

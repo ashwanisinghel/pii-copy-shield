@@ -2,7 +2,7 @@
 
 Effective date: October 17, 2026
 
-PII Copy Shield processes selected text locally in the browser when a user copies it. It replaces recognized email addresses, phone numbers, Indian mobile numbers, Social Security numbers, payment card numbers, and IPv4 addresses with placeholders before the text reaches the clipboard.
+PII Copy Shield processes selected text locally in the browser when a user copies it. It replaces recognized email addresses, phone numbers, Indian mobile numbers, Indian PAN and Aadhaar numbers, Social Security numbers, payment card numbers, and IPv4 addresses with placeholders before the text reaches the clipboard.
 
 ## Data collection and transmission
 
