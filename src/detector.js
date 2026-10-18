@@ -67,7 +67,12 @@
     return value.split(".").every((part) => Number(part) >= 0 && Number(part) <= 255);
   }
 
+  // Dates and timestamps ("2026-10-17 15:32", "17/10/2026 15:32:05") look like
+  // 10-12 digit phone numbers once separators are ignored.
+  const DATE_LIKE = /^\(?\d{4}[-/.]\d{1,2}[-/.]\d{1,2}(?!\d)|^\d{1,2}[-/.]\d{1,2}[-/.]\d{4}(?!\d)/;
+
   function isGenericPhoneLength(value) {
+    if (DATE_LIKE.test(value.trim())) return false;
     const digitCount = value.replace(/\D/g, "").length;
     return digitCount >= 10 && digitCount <= 12;
   }
