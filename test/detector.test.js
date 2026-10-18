@@ -53,4 +53,8 @@ assert.equal(ex("a@b.co c@d.co", ["*@*.co"]), "[EMAIL] [EMAIL]");
 assert.equal(ex("a@b.co c@d.co", [".*"]), "[EMAIL] [EMAIL]");
 assert.equal(ex("a@b.co c@d.co", ["b.co"]), "[EMAIL] [EMAIL]");
 assert.equal(ex("a@b.co", [null, 5, ""]), "[EMAIL]");
+["2026-10-17", "2026-10-17 15:32", "2026-10-17 15:32:05", "17/10/2026 15:32", "2026-10-17T15:32:05Z"].forEach((date) => {
+  assert.equal(sanitize("Date " + date + " end").text, "Date " + date + " end");
+});
+assert.equal(sanitize("Call (415) 555-2671").text, "Call [PHONE]");
 console.log("detector tests passed");
